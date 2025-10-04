@@ -136,5 +136,4 @@ docker compose logs -f web
   docker compose exec app php bin/phpunit
   ```
 
-**Author:** Your Name  
 **Repository:** [https://github.com/nilsbacz/symfony-basket-api](https://github.com/nilsbacz/symfony-basket-api)
