@@ -1,4 +1,4 @@
-# ---- Symfony / PHP ----
+###> symfony/framework-bundle ###
 /vendor/
 /var/
 /public/bundles/
@@ -9,6 +9,9 @@
 /phpunit.xml.cache
 /composer.lock
 /symfony.lock
+/.env.local.php
+/config/secrets/prod/prod.decrypt.private.php
+###< symfony/framework-bundle ###
 
 # ---- Logs and cache ----
 /var/cache/
