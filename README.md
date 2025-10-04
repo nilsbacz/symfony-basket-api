@@ -81,42 +81,6 @@ cd symfony-basket-api
 docker compose up -d --build
 ```
 
-### 2️⃣ Install PHP dependencies
-
-```bash
-docker compose exec app composer install
-```
-
-### 3️⃣ Create the database
-
-```bash
-docker compose exec app php bin/console doctrine:database:create --if-not-exists
-```
-
-(Once you add entities, you can later run migrations:
-```bash
-docker compose exec app php bin/console doctrine:migrations:migrate --no-interaction
-```)
-
----
-
-## 🧪 Testing the setup
-
-- Visit: [http://localhost:8080](http://localhost:8080)  
-  You should see Symfony’s welcome page or a 404.
-
-**Quick health check** (temporary):
-```bash
-docker compose exec app bash -lc "printf '%s\n' '<?php echo \"OK\";' > public/health.php"
-curl http://localhost:8080/health
-```
-
-You should get:
-```
-HTTP/1.1 200 OK
-OK
-```
-
 ---
 
 ## 🧩 Database credentials
@@ -166,34 +130,11 @@ docker compose logs -f web
 ## 🧠 Development notes
 
 - **Autocompletion**: PhpStorm will index your `vendor/` because it’s mounted from the host.
-- **Atomic commits**:
-    - `chore:` → environment/config updates
-    - `feat:` → new features or endpoints
-    - `fix:` → bug fixes
-    - `test:` → tests and test setup
 - **Tests**:  
   Run inside the container:
   ```bash
   docker compose exec app php bin/phpunit
   ```
 
----
-
-## 🔮 Future improvements
-
-- Add Basket and Product entities
-- Implement CRUD REST endpoints
-- Add request validation and exception handling
-- Write PHPUnit integration tests
-- Use DataFixtures for seeding demo data
-
----
-
-## 🧾 License
-
-MIT (or specify your chosen license)
-
----
-
 **Author:** Your Name  
-**Repository:** [https://github.com/YOUR_USERNAME/symfony-basket-api](https://github.com/YOUR_USERNAME/symfony-basket-api)
+**Repository:** [https://github.com/nilsbacz/symfony-basket-api](https://github.com/nilsbacz/symfony-basket-api)
