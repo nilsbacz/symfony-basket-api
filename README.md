@@ -1,146 +1,145 @@
-# Symfony Basket API — Docker (MySQL) Starter
+# 🧺 Symfony Basket API
 
-A minimal Docker setup for a Symfony 7+ REST API (basket service) using **PHP-FPM**, **nginx**, and **MySQL 8** — without Make. This README shows how to run everything with plain `docker compose`.
-
----
-
-## Prerequisites
-
-- **Docker Engine** + **Docker Compose v2**
-- **Git** (for version control)
-
-> Linux users: ensure your user is in the `docker` group.
->
-> ```bash
-> sudo usermod -aG docker $USER
-> # log out/in or: newgrp docker
-> ```
+A RESTful Basket API built with **Symfony 7**, running in **Docker** using **PHP-FPM**, **nginx**, and **MySQL 8** — no API Platform.
 
 ---
 
-## Project layout
+## 🚀 Overview
 
-```
-.docker/
-  app/
-    Dockerfile       # PHP 8.3 FPM image with required extensions
-    php.ini          # Dev-friendly PHP settings + opcache
-  nginx/
-    default.conf     # nginx vhost (front controller pattern)
-docker-compose.yml   # services: app, web, db
-.gitignore           # starter ignore file
-```
+This project is a coding task demonstrating:
+
+- A clean, RESTful API design using Symfony
+- Proper Docker-based environment setup
+- Usage of Doctrine ORM with MySQL
+- Unit and integration testing
+- Atomic Git commits and structured project organization
 
 ---
 
-## 1) Start the stack
+## 🧩 Tech Stack
 
-Build and start containers in the background:
+| Component | Purpose |
+|------------|----------|
+| **Symfony 7** | PHP framework (main application) |
+| **PHP 8.3-FPM** | Executes Symfony code |
+| **nginx (1.27)** | Serves HTTP requests and static assets |
+| **MySQL 8.0** | Database for basket and product data |
+| **Docker Compose** | Orchestration |
+| **Composer** | Dependency management |
+| **PHPUnit** | Testing |
+
+---
+
+## 🧰 Prerequisites
+
+- **Docker Engine** + **Docker Compose Plugin**
+- **Git**
+
+On Linux, ensure your user is in the `docker` group:
 
 ```bash
-# from repo root
+sudo usermod -aG docker $USER
+# Log out and back in (or run: newgrp docker)
+```
+
+---
+
+## 🧱 Project structure
+
+```
+.
+├── .docker/
+│   ├── app/Dockerfile           # PHP-FPM image
+│   ├── app/php.ini              # Custom PHP config
+│   └── nginx/default.conf       # nginx vhost
+├── bin/                         # Symfony console
+├── config/                      # Framework configuration
+├── public/                      # Document root (index.php entry)
+├── src/                         # Application code (controllers, entities, etc.)
+├── tests/                       # PHPUnit tests
+├── docker-compose.yml           # Docker services definition
+├── .env                         # Symfony environment vars
+├── composer.json
+├── .gitignore
+└── README.md
+```
+
+---
+
+## ⚙️ Setup & Run
+
+Clone the repository:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/symfony-basket-api.git
+cd symfony-basket-api
+```
+
+### 1️⃣ Start the stack
+
+```bash
 docker compose up -d --build
 ```
 
-Check that all services are healthy:
+### 2️⃣ Install PHP dependencies
 
 ```bash
-docker compose ps
+docker compose exec app composer install
 ```
 
-- `web` should be `Up`
-- `app` should be `Up`
-- `db` should be `healthy`
-
-Logs (follow):
+### 3️⃣ Create the database
 
 ```bash
-docker compose logs -f --no-log-prefix web
+docker compose exec app php bin/console doctrine:database:create --if-not-exists
 ```
 
-Stop everything:
-
+(Once you add entities, you can later run migrations:
 ```bash
-docker compose down
+docker compose exec app php bin/console doctrine:migrations:migrate --no-interaction
+```)
+
+---
+
+## 🧪 Testing the setup
+
+- Visit: [http://localhost:8080](http://localhost:8080)  
+  You should see Symfony’s welcome page or a 404.
+
+**Quick health check** (temporary):
+```bash
+docker compose exec app bash -lc "printf '%s\n' '<?php echo \"OK\";' > public/health.php"
+curl http://localhost:8080/health
 ```
 
-Remove containers **and** named volumes (DB data, vendor cache):
-
-```bash
-docker compose down -v
+You should get:
+```
+HTTP/1.1 200 OK
+OK
 ```
 
 ---
 
-## 2) Bootstrap Symfony inside the container
+## 🧩 Database credentials
 
-> Skip this if you already have a Symfony app in the repo.
+| Key | Value |
+|-----|--------|
+| **Host (from app)** | `db` |
+| **Host (from host machine)** | `127.0.0.1` |
+| **Port** | `3306` |
+| **Database** | `basket` |
+| **User** | `symfony` |
+| **Password** | `secret` |
+| **Root password** | `rootsecret` |
 
-Open a shell in the **app** container:
-
-```bash
-docker compose exec app bash
-```
-
-Create the Symfony skeleton in the mounted project root:
-
-```bash
-composer create-project symfony/skeleton .
-```
-
-Install Doctrine and friends (you'll need these soon):
+You can connect from your host for debugging:
 
 ```bash
-composer require symfony/orm-pack
-composer require symfony/maker-bundle --dev
-```
-
-Ensure the environment variable is set for Doctrine (already in `docker-compose.yml`):
-
-```
-DATABASE_URL="mysql://symfony:secret@db:3306/basket?serverVersion=8.0&charset=utf8mb4"
-```
-
-Create the database:
-
-```bash
-php bin/console doctrine:database:create --if-not-exists
-```
-
-> Later, when you add entities/migrations:
->
-> ```bash
-> php bin/console make:migration
-> php bin/console doctrine:migrations:migrate --no-interaction
-> ```
-
-Exit the container shell when done:
-
-```bash
-exit
+mysql -h 127.0.0.1 -P 3306 -u symfony -psecret basket
 ```
 
 ---
 
-## 3) Verify nginx ↔ PHP ↔ Symfony
-
-With the stack running, open:
-
-- http://localhost:8080 — you should see a Symfony response (404 until you add a route, which is fine).
-
-Create a quick health route to be sure:
-
-```bash
-docker compose exec app bash -lc "printf '%s\n' '<?php\n// public/health.php\nhttp_response_code(200);\necho \"OK\";\n' > public/health.php"
-```
-
-Now visit http://localhost:8080/health — it should print `OK`.
-
-> Remove `public/health.php` later; your real app will route everything via `public/index.php`.
-
----
-
-## 4) Useful `docker compose` commands (no Make)
+## 🧰 Common Docker commands
 
 ```bash
 # Build & start
@@ -149,94 +148,52 @@ docker compose up -d --build
 # Stop
 docker compose down
 
-# Stop and remove volumes (DB data, vendor cache)
+# Stop & remove volumes (DB data, vendor cache)
 docker compose down -v
 
-# Shell into PHP app container
+# Rebuild PHP app only
+docker compose build app
+
+# Shell into PHP container
 docker compose exec app bash
 
-# Tail logs for nginx
+# Logs
 docker compose logs -f web
-
-# Run Composer inside the container
-docker compose exec app composer install
-
-# Run Symfony CLI inside the container
-docker compose exec app php bin/console
 ```
 
 ---
 
-## 5) Database access (MySQL)
+## 🧠 Development notes
 
-- Host (from app container): `db`
-- Host (from your machine): `127.0.0.1`
-- Port: `3306`
-- DB: `basket`
-- User: `symfony`
-- Password: `secret`
-
-From the host, you can test with:
-
-```bash
-mysql -h 127.0.0.1 -P 3306 -u symfony -psecret basket -e "SELECT 1;"
-```
+- **Autocompletion**: PhpStorm will index your `vendor/` because it’s mounted from the host.
+- **Atomic commits**:
+    - `chore:` → environment/config updates
+    - `feat:` → new features or endpoints
+    - `fix:` → bug fixes
+    - `test:` → tests and test setup
+- **Tests**:  
+  Run inside the container:
+  ```bash
+  docker compose exec app php bin/phpunit
+  ```
 
 ---
 
-## 6) Curl examples (once you add routes)
+## 🔮 Future improvements
 
-```bash
-# Ping health (temporary file example above)
-curl -i http://localhost:8080/health
-
-# Symfony front controller example (will 404 until controllers exist)
-curl -i http://localhost:8080/
-```
+- Add Basket and Product entities
+- Implement CRUD REST endpoints
+- Add request validation and exception handling
+- Write PHPUnit integration tests
+- Use DataFixtures for seeding demo data
 
 ---
 
-## 7) Troubleshooting
+## 🧾 License
 
-**`usermod: group 'docker' does not exist`**
-- Install Docker first, then add your user to the `docker` group:
-  ```bash
-  sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-  getent group docker || sudo groupadd docker
-  sudo usermod -aG docker $USER
-  # log out/in or: newgrp docker
-  ```
-
-**`db` not healthy / connection refused**
-- Give MySQL a moment to initialize; check logs:
-  ```bash
-  docker compose logs -f db
-  ```
-- Ensure your `DATABASE_URL` matches `docker-compose.yml`.
-
-**Port already in use (8080 or 3306)**
-- Change the host port mapping in `docker-compose.yml`:
-  ```yaml
-  web:
-    ports:
-      - "8081:80"
-  db:
-    ports:
-      - "3307:3306"
-  ```
-- Then `docker compose up -d` again and update your client URLs/ports.
-
-**PHP extensions missing (pdo_mysql, intl, mbstring, zip)**
-- They’re installed by the Dockerfile. Rebuild if you changed the file:
-  ```bash
-  docker compose build --no-cache app
-  docker compose up -d
-  ```
-
-**Permission issues on vendor/**
-- `app_vendor` is a named volume. Recreate containers/volumes:
-  ```bash
-  docker compose down -v && docker compose up -d --build
-  ```
+MIT (or specify your chosen license)
 
 ---
+
+**Author:** Your Name  
+**Repository:** [https://github.com/YOUR_USERNAME/symfony-basket-api](https://github.com/YOUR_USERNAME/symfony-basket-api)
