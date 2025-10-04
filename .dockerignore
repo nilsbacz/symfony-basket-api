@@ -1,0 +1,11 @@
+# Keep the build context small & avoid overwriting builder vendor
+.git
+.gitignore
+.idea
+.vscode
+node_modules
+vendor
+var
+docker-data
+public/build
+.env*
