@@ -1,6 +1,5 @@
 # Multi-stage build for PHP-FPM with Composer and common Symfony extensions
 
-
 # 1) Composer deps builder
 FROM composer:2 AS composer_builder
 WORKDIR /app
