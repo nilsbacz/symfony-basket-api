@@ -1,0 +1,29 @@
+# ---- Symfony / PHP ----
+/vendor/
+/var/
+/public/bundles/
+/.env.local
+/.env.*.local
+/.phpunit.result.cache
+/phpunit.xml
+/phpunit.xml.cache
+/composer.lock
+/symfony.lock
+
+# ---- Logs and cache ----
+/var/cache/
+/var/logs/
+/var/sessions/
+
+# ---- Docker ----
+/docker-data/
+/db_data/
+/app_vendor/
+
+# ---- IDEs ----
+.idea/
+.vscode/
+
+# ---- OS junk ----
+.DS_Store
+Thumbs.db
