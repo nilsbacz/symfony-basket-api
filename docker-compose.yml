@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: ./.docker/app/Dockerfile
-    container_name: basket-app
     environment:
       APP_ENV: dev
       PHP_OPCACHE_VALIDATE_TIMESTAMPS: "1"
@@ -18,7 +17,6 @@ services:
 
   web:
     image: nginx:1.27-alpine
-    container_name: basket-web
     ports:
       - "8080:80"
     volumes:
@@ -30,7 +28,6 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: basket-db
     environment:
       MYSQL_DATABASE: basket
       MYSQL_USER: symfony
