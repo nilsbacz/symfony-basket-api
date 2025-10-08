@@ -1,11 +1,10 @@
 #!/bin/sh
 set -e
 
-# Wait for DB to be healthy
-echo "⏳ Waiting for database..."
-until php bin/console doctrine:query:sql "SELECT 1" >/dev/null 2>&1; do
-  sleep 2
-done
+# Wait for database (simple static delay)
+echo "⏳ Waiting 10 seconds for the database to be ready..."
+sleep ${WAIT_FOR_DB_SECONDS:-10}
+echo "✅ Continuing startup..."
 
 # Run migrations automatically (safe for review/demo)
 echo "🚀 Running migrations..."
