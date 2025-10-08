@@ -15,6 +15,12 @@
         "symfony/yaml": "7.3.*"
     },
     "require-dev": {
+        "doctrine/dbal": "^3",
+        "doctrine/doctrine-bundle": "^2.16",
+        "doctrine/doctrine-migrations-bundle": "^3.4",
+        "doctrine/migrations": "^3.9",
+        "doctrine/orm": "^3.5",
+        "symfony/maker-bundle": "^1.64"
     },
     "config": {
         "allow-plugins": {
