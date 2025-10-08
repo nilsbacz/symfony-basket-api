@@ -1,6 +1,7 @@
+# .docker/app/Dockerfile
 # Multi-stage build for PHP-FPM with Composer and common Symfony extensions
 
-# 1) Composer deps builder (uses composer.json to prebuild vendor)
+# 1️⃣ Composer deps builder (prebuilds vendor for caching)
 FROM composer:2 AS composer_builder
 WORKDIR /app
 COPY composer.json composer.lock* symfony.lock* ./
@@ -20,7 +21,13 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 # PHP settings
 COPY ./.docker/app/php.ini $PHP_INI_DIR/conf.d/php-custom.ini
 
-# Copy vendor from builder first (owned by symfony)
+# --- Create non-root user BEFORE switching ---
+ARG UID=1000
+ARG GID=1000
+RUN addgroup -g ${GID} symfony \
+    && adduser -D -G symfony -u ${UID} symfony
+
+# --- # Copy vendor from builder first (owned by symfony) ---
 COPY --chown=symfony:symfony --from=composer_builder /app/vendor /var/www/html/vendor
 
 # Copy app code (excluding items filtered by .dockerignore) as symfony user
@@ -31,5 +38,6 @@ COPY --chown=symfony:symfony ./.docker/app/entrypoint.sh /usr/local/bin/entrypoi
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 USER symfony
+
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]
