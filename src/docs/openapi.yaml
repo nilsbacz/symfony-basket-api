@@ -1,0 +1,44 @@
+openapi: 3.0.3
+info:
+    title: Basket API
+    version: 1.0.0
+paths:
+    /api/baskets:
+        post:
+            summary: Create a new basket
+            responses:
+                '201':
+                    description: Basket created
+                    headers:
+                        Location:
+                            description: URL of the created basket
+                            schema: { type: string, format: uri }
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id: { type: integer, example: 1 }
+                                    createdAt: { type: string, format: date-time }
+    /api/baskets/{id}:
+        get:
+            summary: Get a basket by id
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema: { type: integer }
+            responses:
+                '200':
+                    description: Basket details
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id: { type: integer }
+                                    createdAt: { type: string, format: date-time }
+                                    items:
+                                        type: array
+                                        items:
+                                            type: object

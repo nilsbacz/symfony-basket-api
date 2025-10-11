@@ -42,6 +42,16 @@ sudo usermod -aG docker $USER
 # Log out and back in (or run: newgrp docker)
 ```
 
+## 📘 API Documentation
+The REST API is documented using the [OpenAPI Specification](https://swagger.io/specification/).
+You can view the full interactive API documentation here:
+
+👉 [Open API Docs (HTML)](src/docs/api-docs.html)
+
+You can also open the YAML spec directly at:
+
+👉 [src/docs/openapi.yaml](src/docs/openapi.yaml)
+
 ---
 
 ## 🧱 Project structure
@@ -80,6 +90,8 @@ cd symfony-basket-api
 ```bash
 docker compose up -d --build
 ```
+
+If everything works, the symfony 7 welcome page should be found under [http://localhost:8080/](http://localhost:8080/)
 
 ---
 
@@ -134,6 +146,11 @@ docker compose logs -f web
   Run inside the container:
   ```bash
   docker compose exec app php bin/phpunit
+  ```
+- **Docs**: Generate the html using redoc:
+  ```bash
+  sudo npm install -g redoc-cli
+  redoc-cli bundle openapi.yaml -o api-docs.html
   ```
 
 **Repository:** [https://github.com/nilsbacz/symfony-basket-api](https://github.com/nilsbacz/symfony-basket-api)
