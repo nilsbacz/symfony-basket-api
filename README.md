@@ -46,11 +46,11 @@ sudo usermod -aG docker $USER
 The REST API is documented using the [OpenAPI Specification](https://swagger.io/specification/).
 You can view the full interactive API documentation here:
 
-👉 [Open API Docs (HTML)](src/docs/api-docs.html)
+👉 [Open API Docs (HTML)](docs/api-docs.html)
 
 You can also open the YAML spec directly at:
 
-👉 [src/docs/openapi.yaml](src/docs/openapi.yaml)
+👉 [src/docs/openapi.yaml](docs/openapi.yaml)
 
 ---
 
