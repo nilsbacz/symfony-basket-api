@@ -75,4 +75,16 @@ class Basket
     {
         $this->createdAt = new \DateTimeImmutable();
     }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'createdAt' => $this->getCreatedAt()?->format(DATE_ATOM),
+            'items' => array_map(
+                fn($item) => $item->toArray(),
+                $this->getItems()->toArray()
+            ),
+        ];
+    }
 }

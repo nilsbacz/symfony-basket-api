@@ -63,4 +63,13 @@ class BasketItem
 
         return $this;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'quantity' => $this->getQuantity(),
+            'product' => $this->getProduct()?->toArray(),
+        ];
+    }
 }
