@@ -34,15 +34,10 @@ final class BasketController extends AbstractController
         );
     }
 
-    // Minimal GET so the Location header resolves
     #[Route('/api/baskets/{id}', name: 'api_baskets_get', methods: ['GET'])]
     public function getOne(Basket $basket): JsonResponse
     {
-        return $this->json([
-            'id' => $basket->getId(),
-            'createdAt' => $basket->getCreatedAt()->format(DATE_ATOM),
-            'items' => $basket->getItems()->toArray(),
-        ]);
+        return $this->json($basket->toArray());
     }
 
     #[Route('/api/baskets/{id}/items', name: 'api_baskets_items_add', methods: ['POST'])]
