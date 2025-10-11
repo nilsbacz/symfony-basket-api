@@ -42,3 +42,60 @@ paths:
                                         type: array
                                         items:
                                             type: object
+    /api/products:
+        get:
+            summary: Get a sorted list of all active products in stock
+            responses:
+                '200':
+                    description: Basket details
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: integer
+                                            example: 4
+                                        name:
+                                            type: string
+                                            example: "27-inch Monitor"
+                                        quantity:
+                                            type: integer
+                                            example: 10
+                                        active:
+                                            type: boolean
+                                            example: true
+                                        price:
+                                            type: integer
+                                            example: 19999
+                            examples:
+                                success:
+                                    summary: Example product list
+                                    value:
+                                        -   id: 4
+                                            name: "27-inch Monitor"
+                                            quantity: 10
+                                            active: true
+                                            price: 19999
+                                        -   id: 2
+                                            name: "Mechanical Keyboard"
+                                            quantity: 20
+                                            active: true
+                                            price: 7999
+                                        -   id: 3
+                                            name: "USB-C Cable"
+                                            quantity: 100
+                                            active: true
+                                            price: 999
+                                        -   id: 5
+                                            name: "Webcam HD"
+                                            quantity: 15
+                                            active: true
+                                            price: 4999
+                                        -   id: 1
+                                            name: "Wireless Mouse"
+                                            quantity: 50
+                                            active: true
+                                            price: 2999

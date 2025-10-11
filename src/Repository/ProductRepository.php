@@ -23,4 +23,15 @@ class ProductRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findActiveInStock(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.active = :active')
+            ->andWhere('p.quantity > 0')
+            ->setParameter('active', true)
+            ->orderBy('p.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
