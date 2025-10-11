@@ -21,6 +21,9 @@ class Basket
     #[ORM\OneToMany(targetEntity: BasketItem::class, mappedBy: 'basket')]
     private Collection $items;
 
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -59,5 +62,16 @@ class Basket
         }
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
     }
 }
