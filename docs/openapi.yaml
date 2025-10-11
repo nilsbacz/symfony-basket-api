@@ -6,6 +6,8 @@ paths:
     /api/baskets:
         post:
             summary: Create a new basket
+            tags:
+                - Baskets
             responses:
                 '201':
                     description: Basket created
@@ -28,6 +30,8 @@ paths:
                   name: id
                   required: true
                   schema: { type: integer }
+            tags:
+                - Baskets
             responses:
                 '200':
                     description: Basket details
@@ -55,6 +59,8 @@ paths:
                     schema:
                         type: integer
                     description: ID of the basket to modify
+            tags:
+                - Baskets
             requestBody:
                 required: true
                 content:
@@ -110,9 +116,46 @@ paths:
                                     error:
                                         type: string
                                         example: basket not found
+    /api/baskets/{id}/items/{itemId}:
+        delete:
+            summary: Remove a product item from a basket
+            description: |
+                Deletes the specified basket item from the given basket.
+                If the item does not belong to the basket or cannot be found, a 404 error is returned.
+            tags:
+                - Baskets
+            parameters:
+                -   name: id
+                    in: path
+                    required: true
+                    description: ID of the basket
+                    schema:
+                        type: integer
+                -   name: itemId
+                    in: path
+                    required: true
+                    description: ID of the basket item to remove
+                    schema:
+                        type: integer
+            responses:
+                "204":
+                    description: Basket item successfully removed (no content)
+                "404":
+                    description: Basket or basket item not found
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+                                        example: item does not belong to this basket
+
     /api/products:
         get:
             summary: Get a sorted list of all active products in stock
+            tags:
+                - Products
             responses:
                 '200':
                     description: Basket details

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Basket;
+use App\Entity\BasketItem;
 use App\Repository\BasketItemRepository;
 use App\Repository\BasketRepository;
 use App\Repository\ProductRepository;
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 final class BasketController extends AbstractController
 {
@@ -75,4 +77,22 @@ final class BasketController extends AbstractController
 
         return $this->json($basket->toArray());
     }
+
+    #[Route('/api/baskets/{id}/items/{itemId}', name: 'api_baskets_items_delete', methods: ['DELETE'])]
+    public function deleteItem(
+        int                                                  $id,
+        #[MapEntity(mapping: ['itemId' => 'id'])] BasketItem $basketItem,
+        EntityManagerInterface                               $entityManager
+    ): Response
+    {
+        if ($basketItem->getBasket()->getId() !== $id) {
+            return $this->json(['error' => 'item does not belong to this basket'], 404);
+        }
+
+        $entityManager->remove($basketItem);
+        $entityManager->flush();
+
+        return new Response(null, Response::HTTP_NO_CONTENT);
+    }
+
 }
