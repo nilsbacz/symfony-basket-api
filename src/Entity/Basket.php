@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BasketRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Basket
 {
     #[ORM\Id]
