@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\BasketItem;
+use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,13 @@ class BasketItemRepository extends ServiceEntityRepository
         parent::__construct($registry, BasketItem::class);
     }
 
-    //    /**
-    //     * @return BasketItem[] Returns an array of BasketItem objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('b.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function createByProduct(Product $product, int $quantity): BasketItem
+    {
+        $basketItem = new BasketItem();
 
-    //    public function findOneBySomeField($value): ?BasketItem
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        $basketItem->setProduct($product);
+        $basketItem->setQuantity($quantity);
+
+        return $basketItem;
+    }
 }

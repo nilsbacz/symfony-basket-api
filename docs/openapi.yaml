@@ -42,6 +42,74 @@ paths:
                                         type: array
                                         items:
                                             type: object
+    /api/baskets/{id}/items:
+        post:
+            summary: Add a product to a basket
+            description: >
+                Adds a product to the specified basket.
+                If the product already exists in the basket, its quantity will be increased.
+            parameters:
+                -   in: path
+                    name: id
+                    required: true
+                    schema:
+                        type: integer
+                    description: ID of the basket to modify
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - productId
+                            properties:
+                                productId:
+                                    type: integer
+                                    example: 2
+                                amount:
+                                    type: integer
+                                    example: 3
+                                    description: Quantity of the product to add (defaults to 1)
+            responses:
+                '200':
+                    description: Product added or quantity updated
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: integer
+                                        example: 1
+                                    createdAt:
+                                        type: string
+                                        format: date-time
+                                        example: "2025-10-11T12:10:06+00:00"
+                                    items:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                id:
+                                                    type: integer
+                                                    example: 1
+                                                productId:
+                                                    type: integer
+                                                    example: 2
+                                                quantity:
+                                                    type: integer
+                                                    example: 3
+                '404':
+                    description: Basket or product not found
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+                                        example: basket not found
     /api/products:
         get:
             summary: Get a sorted list of all active products in stock
