@@ -17,6 +17,7 @@ class BasketItem
     private ?int $quantity = 1;
 
     #[ORM\ManyToOne(inversedBy: 'items')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Basket $basket = null;
 
     #[ORM\ManyToOne]

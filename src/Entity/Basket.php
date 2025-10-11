@@ -43,14 +43,20 @@ class Basket
         return $this->items;
     }
 
-    public function addItem(BasketItem $item): static
+    public function addItem(BasketItem $item): BasketItem
     {
-        if (!$this->items->contains($item)) {
-            $this->items->add($item);
-            $item->setBasket($this);
+        // If the same product already exists in this basket, increase its quantity
+        foreach ($this->items as $existing) {
+            if ($existing->getProduct() === $item->getProduct()) {
+                $existing->setQuantity($existing->getQuantity() + $item->getQuantity());
+                return $existing;
+            }
         }
 
-        return $this;
+        // Otherwise add as a new line
+        $this->items->add($item);
+        $item->setBasket($this);
+        return $item;
     }
 
     public function removeItem(BasketItem $item): static
