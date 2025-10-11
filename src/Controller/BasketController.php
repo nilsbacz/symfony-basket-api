@@ -95,4 +95,39 @@ final class BasketController extends AbstractController
         return new Response(null, Response::HTTP_NO_CONTENT);
     }
 
+    #[Route('/api/baskets/{id}/items/{itemId}', name: 'api_baskets_items_update', methods: ['PATCH'])]
+    public function updateItem(
+        int                                                  $id,
+        Request                                              $request,
+        #[MapEntity(mapping: ['itemId' => 'id'])] BasketItem $basketItem,
+        EntityManagerInterface                               $entityManager
+    ): Response
+    {
+        if ($basketItem->getBasket()->getId() !== $id) {
+            return $this->json(['error' => 'item does not belong to this basket'], 404);
+        }
+
+        $requestData = $request->toArray();
+        $quantity = $requestData['quantity'] ?? null;
+        if (!is_int($quantity)) {
+            return $this->json(['error' => 'quantity is required and must be an integer'], 400);
+        }
+
+        if ($quantity < 0) {
+            return $this->json(['error' => 'quantity must be >= 0'], 422);
+        }
+
+        if ($quantity === 0) {
+            $entityManager->remove($basketItem);
+            $entityManager->flush();
+            return new Response(null, Response::HTTP_NO_CONTENT);
+        }
+
+        if ($basketItem->getQuantity() !== $quantity) {
+            $basketItem->setQuantity($quantity);
+            $entityManager->flush();
+        }
+
+        return new Response(null, Response::HTTP_NO_CONTENT);
+    }
 }

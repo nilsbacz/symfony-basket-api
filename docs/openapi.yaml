@@ -150,6 +150,54 @@ paths:
                                     error:
                                         type: string
                                         example: item does not belong to this basket
+        patch:
+            summary: Update an item in a basket
+            description: |
+                Updates the quantity of an existing item in the specified basket.
+                If the quantity is set to 0, the item will be removed from the basket.
+            tags:
+                - Baskets
+            parameters:
+                -   name: id
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+                    description: The ID of the basket.
+                -   name: itemId
+                    in: path
+                    required: true
+                    schema:
+                        type: integer
+                    description: The ID of the basket item to update.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - quantity
+                            properties:
+                                quantity:
+                                    type: integer
+                                    minimum: 0
+                                    description: |
+                                        New quantity for this basket item.
+                                        Setting to 0 will remove the item from the basket.
+                            example:
+                                quantity: 2
+            responses:
+                '204':
+                    description: Item successfully updated or removed. No content returned.
+                '400':
+                    description: Invalid request (e.g., missing or non-integer quantity).
+                '404':
+                    description: Basket or basket item not found, or item does not belong to this basket.
+                '422':
+                    description: Invalid quantity (e.g., negative value).
+                '500':
+                    description: Unexpected server error.
 
     /api/products:
         get:
