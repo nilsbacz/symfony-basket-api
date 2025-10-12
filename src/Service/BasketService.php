@@ -7,7 +7,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class BasketService
 {
-    public function __construct(private EntityManagerInterface $entityManager) {}
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
 
     public function create(): Basket
     {
