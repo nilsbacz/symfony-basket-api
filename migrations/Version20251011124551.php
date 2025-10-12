@@ -25,7 +25,7 @@ final class Version20251011124551 extends AbstractMigration
             ('Mechanical Keyboard', 20, 1, 7999),
             ('USB-C Cable', 100, 1, 999),
             ('27-inch Monitor', 0, 1, 19999),
-            ('Webcam FullHD', 15, 1, 4999)
+            ('Webcam FullHD', 15, 1, 4999),
             ('Webcam HD', 15, 0, 2999)
         ");
     }
