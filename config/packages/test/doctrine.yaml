@@ -1,0 +1,4 @@
+doctrine:
+    dbal:
+        url: 'mysql://symfony:secret@db:3306/basket_test?serverVersion=8.0&charset=utf8mb4'
+        dbname_suffix: ''

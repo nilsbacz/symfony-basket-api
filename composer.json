@@ -20,6 +20,9 @@
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/migrations": "^3.9",
         "doctrine/orm": "^3.5",
+        "phpunit/phpunit": "^12.4",
+        "symfony/browser-kit": "7.3.*",
+        "symfony/css-selector": "7.3.*",
         "symfony/maker-bundle": "^1.64"
     },
     "config": {
