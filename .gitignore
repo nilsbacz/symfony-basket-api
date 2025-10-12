@@ -30,3 +30,7 @@
 # ---- OS junk ----
 .DS_Store
 Thumbs.db
+
+###> phpunit/phpunit ###
+/.phpunit.cache/
+###< phpunit/phpunit ###

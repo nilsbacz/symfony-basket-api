@@ -16,6 +16,9 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    /**
+     * @return list<Product>
+     */
     public function findAllSorted(): array
     {
         return $this->createQueryBuilder('p')
@@ -24,6 +27,9 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return list<Product>
+     */
     public function findActiveInStock(): array
     {
         return $this->createQueryBuilder('p')

@@ -1,0 +1,62 @@
+name: CI
+
+on:
+    push:
+        branches: [ "**" ]
+    pull_request:
+
+jobs:
+    tests:
+        runs-on: ubuntu-latest
+
+        services:
+            mysql:
+                image: mysql:8.0
+                env:
+                    MYSQL_ROOT_PASSWORD: rootsecret
+                ports: [ "3306:3306" ]
+                options: >-
+                    --health-cmd="mysqladmin ping -h 127.0.0.1 -prootsecret"
+                    --health-interval=5s --health-timeout=5s --health-retries=20
+
+        env:
+            APP_ENV: test
+            APP_DEBUG: 0
+            DATABASE_URL: "mysql://root:rootsecret@127.0.0.1:3306/basket_test?serverVersion=8.0&charset=utf8mb4"
+
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: mbstring, intl, pdo_mysql, zip
+                    coverage: none
+                    tools: composer:v2
+
+            -   run: composer install --no-interaction --prefer-dist --no-progress
+
+            -   name: Lint (Symfony)
+                run: composer lint:symfony
+
+            -   name: Lint (PHP_CodeSniffer)
+                run: composer lint:phpcs
+
+            -   name: Static analysis (PHPStan)
+                run: composer lint:phpstan
+
+            -   name: Wait for MySQL
+                run: |
+                    for i in {1..120}; do
+                      mysqladmin ping -h 127.0.0.1 -prootsecret && break
+                      sleep 1
+                    done
+
+            -   name: Create database (if needed)
+                run: php bin/console doctrine:database:create --if-not-exists --env=test
+
+            -   name: Run migrations
+                run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+            -   name: Run tests
+                run: ./vendor/bin/phpunit --colors=always

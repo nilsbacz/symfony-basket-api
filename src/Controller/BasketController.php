@@ -44,13 +44,13 @@ final class BasketController extends AbstractController
 
     #[Route('/api/baskets/{id}/items', name: 'api_baskets_items_add', methods: ['POST'])]
     public function addItem(
-        int                    $id,
-        Request                $request,
-        ProductRepository      $products,
-        BasketRepository       $baskets,
-        BasketItemRepository   $basketItemRepository,
-        EntityManagerInterface $entityManager): JsonResponse
-    {
+        int $id,
+        Request $request,
+        ProductRepository $products,
+        BasketRepository $baskets,
+        BasketItemRepository $basketItemRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
         $requestData = $request->toArray();
         $productId = $requestData['productId'];
         $amount = $requestData['amount'] ?? 1;
@@ -80,11 +80,10 @@ final class BasketController extends AbstractController
 
     #[Route('/api/baskets/{id}/items/{itemId}', name: 'api_baskets_items_delete', methods: ['DELETE'])]
     public function deleteItem(
-        int                                                  $id,
+        int $id,
         #[MapEntity(mapping: ['itemId' => 'id'])] BasketItem $basketItem,
-        EntityManagerInterface                               $entityManager
-    ): Response
-    {
+        EntityManagerInterface $entityManager
+    ): Response {
         if ($basketItem->getBasket()->getId() !== $id) {
             return $this->json(['error' => 'item does not belong to this basket'], 404);
         }
@@ -97,12 +96,11 @@ final class BasketController extends AbstractController
 
     #[Route('/api/baskets/{id}/items/{itemId}', name: 'api_baskets_items_update', methods: ['PATCH'])]
     public function updateItem(
-        int                                                  $id,
-        Request                                              $request,
+        int $id,
+        Request $request,
         #[MapEntity(mapping: ['itemId' => 'id'])] BasketItem $basketItem,
-        EntityManagerInterface                               $entityManager
-    ): Response
-    {
+        EntityManagerInterface $entityManager
+    ): Response {
         if ($basketItem->getBasket()->getId() !== $id) {
             return $this->json(['error' => 'item does not belong to this basket'], 404);
         }
