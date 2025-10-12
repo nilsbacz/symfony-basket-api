@@ -82,6 +82,7 @@ class Basket
         $this->createdAt = new \DateTimeImmutable();
     }
 
+    /** @return array<string, mixed> */
     public function toArray(): array
     {
         return [
