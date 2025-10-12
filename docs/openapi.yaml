@@ -116,6 +116,25 @@ paths:
                                     error:
                                         type: string
                                         example: basket not found
+                '422':
+                    description: Product cannot be added to basket
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+                                        example: product out of stock
+                            examples:
+                                out_of_stock:
+                                    summary: Product is out of stock
+                                    value:
+                                        error: product out of stock
+                                inactive:
+                                    summary: Product is inactive
+                                    value:
+                                        error: product inactive
     /api/baskets/{id}/items/{itemId}:
         delete:
             summary: Remove a product item from a basket
