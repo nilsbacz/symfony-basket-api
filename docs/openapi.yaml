@@ -106,6 +106,16 @@ paths:
                                                 quantity:
                                                     type: integer
                                                     example: 3
+                '400':
+                    description: Product is inactive
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+                                        example: product is inactive
                 '404':
                     description: Basket or product not found
                     content:
