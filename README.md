@@ -156,5 +156,8 @@ docker compose logs -f web
   sudo npm install -g redoc-cli
   redoc-cli bundle openapi.yaml -o api-docs.html
   ```
-
+- **Code Fixer**
+  ```bash
+  vendor/bin/phpcbf
+  ```
 **Repository:** [https://github.com/nilsbacz/symfony-basket-api](https://github.com/nilsbacz/symfony-basket-api)
