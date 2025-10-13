@@ -223,6 +223,26 @@ class BasketControllerTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
     }
 
+    public function testUpdateItemZeroQuantityDeletesLineAndRestoresStock()
+    {
+        $basketId = $this->createBasket();
+        $this->addItemToBasket(2, 3, $basketId);
+
+        $stockBefore = $this->getProductQty(2);
+
+        $getRes = $this->jsonRequest('GET', "/api/baskets/{$basketId}");
+        $lineId = $this->decode($getRes)['items'][0]['id'];
+
+        $this->jsonRequest('PATCH', "/api/baskets/{$basketId}/items/{$lineId}", ['quantity' => 0]);
+        $this->assertResponseStatusCodeSame(204);
+
+        $getRes2 = $this->jsonRequest('GET', "/api/baskets/{$basketId}");
+        $this->assertSame([], json_decode($getRes2->getContent(), true)['items']);
+
+        $productAfterQty = $this->getProductQty(2);
+        $this->assertSame($stockBefore + 3, $productAfterQty);
+    }
+
     protected function createBasket(): int
     {
         $res = $this->jsonRequest('POST', '/api/baskets');
