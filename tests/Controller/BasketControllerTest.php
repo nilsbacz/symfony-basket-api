@@ -276,6 +276,44 @@ class BasketControllerTest extends ApiTestCase
         $this->assertSame(1, $data['items'][0]['quantity']);
     }
 
+    public function testUpdateItemOutOfStockReturnsError(): void
+    {
+        $basketId = $this->createBasket();
+
+        $addRes = $this->addItemToBasket(1, 1, $basketId);
+        $this->assertResponseIsSuccessful();
+
+        $basket = $this->decode($addRes);
+        $itemId = $this->firstItemId($basket);
+
+        $this->patchItem($basketId, $itemId, ['quantity' => 60]);
+        $this->assertResponseStatusCodeSame(422);
+    }
+
+    public function testUpdateItem_DecreaseQuantity_RestoresStock(): void
+    {
+        // Create a basket and add 3 units of product #1
+        $basketId = $this->createBasket();
+        $addRes   = $this->addItemToBasket(1, 3, $basketId);
+        $this->assertResponseIsSuccessful();
+
+        // Stock immediately after adding (i.e., before decreasing)
+        $stockBefore = $this->getProductQty(1);
+
+        // Find the created basket line
+        $basket = $this->decode($addRes);
+        $itemId = $this->firstItemId($basket);
+
+        // Decrease from 3 -> 1 (delta = -2)
+        $res = $this->patchItem($basketId, $itemId, ['quantity' => 1]);
+        $this->assertResponseStatusCodeSame(204);
+
+        // Stock should be increased by 2
+        $stockAfter = $this->getProductQty(1);
+        $this->assertSame($stockBefore + 2, $stockAfter);
+    }
+
+
     protected function createBasket(): int
     {
         $res = $this->jsonRequest('POST', '/api/baskets');
