@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Product;
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class ProductController extends AbstractController
@@ -16,7 +16,7 @@ final class ProductController extends AbstractController
         $activeProducts = $products->findActiveInStock();
 
         // this could also be done automatically by setting up symfony's serializer groups, but this will suffice.
-        $data = array_map(static function (\App\Entity\Product $p) {
+        $data = array_map(static function (Product $p) {
             return [
                 'id'       => $p->getId(),
                 'name'     => $p->getName(),
