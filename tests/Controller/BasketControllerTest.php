@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\BasketItem;
 use App\Repository\BasketRepository;
 use App\Tests\ApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -150,6 +151,96 @@ class BasketControllerTest extends ApiTestCase
         $this->jsonRequest('DELETE', "/api/baskets/$basketId/items/1");
 
         $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testUpdateItemSuccess(): void
+    {
+        $basketId = $this->createBasket();
+
+        $addRes = $this->addItemToBasket(1, 1, $basketId);
+        $this->assertResponseIsSuccessful();
+
+        $basket = json_decode($addRes->getContent(), true);
+        $itemId = $basket['items'][0]['id'];
+
+        $basketItemRepo = $this->em->getRepository(BasketItem::class);
+        $productRepo    = $this->em->getRepository(Product::class);
+
+        // Read current basket item & its product (AFTER initial add)
+        $beforeItem    = $basketItemRepo->find($itemId);
+        $this->assertSame(1, $beforeItem->getQuantity());
+        $productId     = $beforeItem->getProduct()->getId();
+
+        $this->em->clear(); // ensure fresh reads
+        $productBefore = $productRepo->find($productId);
+        $this->assertNotNull($productBefore);
+        $qtyBefore = $productBefore->getQuantity();
+
+        $this->jsonRequest('PATCH', "/api/baskets/$basketId/items/$itemId", [
+            'quantity' => 2,
+        ]);
+        $this->assertResponseStatusCodeSame(204);
+
+        // Fresh reads after PATCH
+        $this->em->clear();
+        $afterItem   = $basketItemRepo->find($itemId);
+        $productAfter = $productRepo->find($productId);
+
+        $this->assertSame(2, $afterItem->getQuantity());
+
+        $delta = 2 - 1; // newQty - oldQty
+        $this->assertSame(
+            $qtyBefore - $delta,
+            $productAfter->getQuantity(),
+            'Product stock should decrease by the quantity delta'
+        );
+    }
+
+    public function testUpdateItemMisingQuantityReturnsError(): void
+    {
+        $basketId = $this->createBasket();
+
+        $addRes = $this->addItemToBasket(1, 1, $basketId);
+        $this->assertResponseIsSuccessful();
+
+        $basket = json_decode($addRes->getContent(), true);
+        $itemId = $basket['items'][0]['id'];
+
+        $this->jsonRequest(
+            'PATCH',
+            "/api/baskets/$basketId/items/$itemId",
+            ["notQuantity" => 2]
+        );
+        $this->assertResponseStatusCodeSame(400);
+    }
+
+    public function testUpdateItemBasketNotFoundReturnsError(): void
+    {
+        $this->jsonRequest(
+            'PATCH',
+            "/api/baskets/1/items/1",
+            ["quantity" => 2]
+        );
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testUpdateItemInvalidQuantityReturnsError(): void
+    {
+        $basketId = $this->createBasket();
+
+        $addRes = $this->addItemToBasket(1, 1, $basketId);
+        $this->assertResponseIsSuccessful();
+
+        $basket = json_decode($addRes->getContent(), true);
+        $itemId = $basket['items'][0]['id'];
+
+        $this->jsonRequest(
+            'PATCH',
+            "/api/baskets/$basketId/items/$itemId",
+            ["quantity" => -1]
+        );
+
+        $this->assertResponseStatusCodeSame(422);
     }
 
     protected function createBasket(): int
