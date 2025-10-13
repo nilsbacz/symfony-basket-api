@@ -257,6 +257,25 @@ class BasketControllerTest extends ApiTestCase
         $this->assertStringContainsString('does not belong', $res->getContent());
     }
 
+    public function testUpdateItemQuantitySameNoContent()
+    {
+        $basketId = $this->createBasket();
+
+        $addRes = $this->addItemToBasket(1, 1, $basketId);
+        $this->assertResponseIsSuccessful();
+
+        $basket = $this->decode($addRes);
+        $itemId = $this->firstItemId($basket);
+
+        $this->patchItem($basketId, $itemId, ['quantity' => 1]);
+
+        $this->assertResponseStatusCodeSame(204);
+
+        $after = $this->jsonRequest('GET', "/api/baskets/{$basketId}");
+        $data = $this->decode($after);
+        $this->assertSame(1, $data['items'][0]['quantity']);
+    }
+
     protected function createBasket(): int
     {
         $res = $this->jsonRequest('POST', '/api/baskets');
