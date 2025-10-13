@@ -143,9 +143,13 @@ docker compose logs -f web
 
 - **Autocompletion**: PhpStorm will index your `vendor/` because it’s mounted from the host.
 - **Tests**:  
-  Run inside the container:
+  Run inside the root directory:
   ```bash
-  docker compose exec app php bin/phpunit
+    docker compose exec app composer test
+  ```
+  With coverage:
+  ```bash
+    docker compose exec app composer test:cov
   ```
 - **Docs**: Generate the html using redoc:
   ```bash

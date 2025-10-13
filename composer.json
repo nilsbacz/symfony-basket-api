@@ -57,20 +57,12 @@
         "symfony/polyfill-php82": "*"
     },
     "scripts": {
+        "test": "php -d pcov.enabled=0 ./vendor/bin/phpunit --no-coverage",
+        "test:cov": "php -d pcov.enabled=1 -d pcov.directory=src ./vendor/bin/phpunit --coverage-text --coverage-html var/coverage/html",
+        "test:cov:xdebug": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text --coverage-html var/coverage/html",
         "lint:phpcs": "phpcs",
         "lint:phpstan": "phpstan analyse",
-        "lint:symfony": "php -d detect_unicode=0 bin/console lint:container --env=prod && bin/console lint:yaml config --parse-tags",
-        "test": "php -d zend.assertions=1 vendor/bin/phpunit",
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        },
-        "post-install-cmd": [
-            "@auto-scripts"
-        ],
-        "post-update-cmd": [
-            "@auto-scripts"
-        ]
+        "lint:symfony": "php -d detect_unicode=0 bin/console lint:container --env=prod && bin/console lint:yaml config --parse-tags"
     },
     "conflict": {
         "symfony/symfony": "*"

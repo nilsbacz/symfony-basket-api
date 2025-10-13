@@ -31,10 +31,11 @@ jobs:
                 with:
                     php-version: '8.3'
                     extensions: mbstring, intl, pdo_mysql, zip
-                    coverage: none
+                    coverage: pcov        # << enable coverage in CI
                     tools: composer:v2
 
-            -   run: composer install --no-interaction --prefer-dist --no-progress
+            -   name: Install Composer deps
+                run: composer install --no-interaction --prefer-dist --no-progress
 
             -   name: Lint (Symfony)
                 run: composer lint:symfony
@@ -58,5 +59,18 @@ jobs:
             -   name: Run migrations
                 run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
 
-            -   name: Run tests
-                run: ./vendor/bin/phpunit --colors=always
+            # Run tests with coverage (PCOV already enabled by setup-php)
+            -   name: Run tests (with coverage)
+                run: |
+                    ./vendor/bin/phpunit \
+                      --colors=always \
+                      --coverage-text \
+                      --coverage-html var/coverage/html
+
+            # Upload HTML coverage as artifact
+            -   name: Upload coverage report
+                if: always()
+                uses: actions/upload-artifact@v4
+                with:
+                    name: coverage-html
+                    path: var/coverage/html

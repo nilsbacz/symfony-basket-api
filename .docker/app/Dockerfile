@@ -1,7 +1,7 @@
 # .docker/app/Dockerfile
 # Multi-stage build for PHP-FPM with Composer and common Symfony extensions
 
-# 1️⃣ Composer deps builder (prebuilds vendor for caching)
+# 1) Composer deps builder (prebuilds vendor for caching)
 FROM composer:2 AS composer_builder
 WORKDIR /app
 COPY composer.json composer.lock* symfony.lock* ./
@@ -14,6 +14,12 @@ WORKDIR /var/www/html
 # --- System deps & PHP extensions ---
 RUN apk add --no-cache bash git oniguruma-dev libzip-dev icu-dev \
   && docker-php-ext-install intl opcache pdo pdo_mysql mbstring zip
+
+# add pcov (kept disabled by default for speed)
+RUN apk add --no-cache $PHPIZE_DEPS \
+    && pecl install pcov \
+    && docker-php-ext-enable pcov \
+    && apk del $PHPIZE_DEPS
 
 # Composer in runtime (handy for dev)
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer

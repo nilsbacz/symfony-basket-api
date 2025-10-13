@@ -27,4 +27,17 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+
+    <coverage>
+        <report>
+            <html outputDirectory="var/coverage/html"/>
+            <text outputFile="php://stdout"/>
+        </report>
+    </coverage>
 </phpunit>
