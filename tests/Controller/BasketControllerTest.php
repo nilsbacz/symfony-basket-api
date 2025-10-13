@@ -120,6 +120,38 @@ class BasketControllerTest extends ApiTestCase
         $this->assertNoBasketData($addRes);
     }
 
+    public function testDeleteItemSuccess(): void
+    {
+        $basketId = $this->createBasket();
+
+        $addRes = $this->addItemToBasket(1, 1, $basketId);
+
+        $added = json_decode($addRes->getContent(), true);
+
+        // Get the created line item id from response
+        $this->assertNotEmpty($added['items']);
+        $itemId = $added['items'][0]['id'];
+
+        $this->jsonRequest('DELETE', "/api/baskets/$basketId/items/1");
+
+        $this->assertResponseStatusCodeSame(204);
+
+        //verify the basket is empty
+        $getRes = $this->jsonRequest('GET', "/api/baskets/{$basketId}");
+        $this->assertResponseIsSuccessful();
+        $after = json_decode($getRes->getContent(), true);
+        $this->assertSame([], $after['items']);
+    }
+
+    public function testDeleteItemBasketItemNotFoundReturnsError(): void
+    {
+        $basketId = $this->createBasket();
+
+        $this->jsonRequest('DELETE', "/api/baskets/$basketId/items/1");
+
+        $this->assertResponseStatusCodeSame(404);
+    }
+
     protected function createBasket(): int
     {
         $res = $this->jsonRequest('POST', '/api/baskets');

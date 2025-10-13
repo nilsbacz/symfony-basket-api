@@ -90,11 +90,11 @@ final class BasketController extends AbstractController
     #[Route('/api/baskets/{id}/items/{itemId}', name: 'api_baskets_items_delete', methods: ['DELETE'])]
     public function deleteItem(
         int $id,
-        #[MapEntity(mapping: ['itemId' => 'id'])] BasketItem $basketItem,
+        #[MapEntity(mapping: ['itemId' => 'id'])] ?BasketItem $basketItem,
         EntityManagerInterface $entityManager
     ): Response {
-        if ($basketItem->getBasket()->getId() !== $id) {
-            return $this->json(['error' => 'item does not belong to this basket'], 404);
+        if (null === $basketItem || !$basketItem->getBasket() || $basketItem->getBasket()->getId() !== $id) {
+            return $this->json(['error' => 'item does not belong to this basket'], Response::HTTP_NOT_FOUND);
         }
 
         $entityManager->remove($basketItem);
@@ -107,7 +107,7 @@ final class BasketController extends AbstractController
     public function updateItem(
         int $id,
         Request $request,
-        #[MapEntity(mapping: ['itemId' => 'id'])] BasketItem $basketItem,
+        #[MapEntity(mapping: ['itemId' => 'id'])] ?BasketItem $basketItem,
         EntityManagerInterface $entityManager
     ): Response {
         if ($basketItem->getBasket()->getId() !== $id) {
