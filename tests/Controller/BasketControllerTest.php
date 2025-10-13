@@ -95,9 +95,7 @@ class BasketControllerTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(404);
         $this->assertStringContainsString('basket not found', $addRes->getContent());
 
-        $json = json_decode($addRes->getContent(), true);
-        $this->assertArrayNotHasKey('id', $json);
-        $this->assertArrayNotHasKey('items', $json);
+        $this->assertNoBasketData($addRes);
     }
 
     public function testAddItemNoProductReturnsError(): void
@@ -108,9 +106,18 @@ class BasketControllerTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(404);
         $this->assertStringContainsString('product not found', $addRes->getContent());
 
-        $json = json_decode($addRes->getContent(), true);
-        $this->assertArrayNotHasKey('id', $json);
-        $this->assertArrayNotHasKey('items', $json);
+        $this->assertNoBasketData($addRes);
+    }
+
+    public function testAddItemProductInactiveReturnsError(): void
+    {
+        $basketId = $this->createBasket();
+
+        $addRes = $this->addItemToBasket(5, 1, $basketId);
+        $this->assertResponseStatusCodeSame(400);
+        $this->assertStringContainsString('product is inactive', $addRes->getContent());
+
+        $this->assertNoBasketData($addRes);
     }
 
     protected function createBasket(): int
@@ -134,5 +141,15 @@ class BasketControllerTest extends ApiTestCase
         return $this->em->getRepository(Product::class)
             ->find($id)
             ->getQuantity();
+    }
+
+    protected function assertNoBasketData(Response $response): array
+    {
+        $json = json_decode($response->getContent(), true);
+
+        $this->assertArrayNotHasKey('id', $json, 'Unexpected basket id in response');
+        $this->assertArrayNotHasKey('items', $json, 'Unexpected basket items in response');
+
+        return $json;
     }
 }

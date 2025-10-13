@@ -66,6 +66,10 @@ final class BasketController extends AbstractController
             return $this->json(['error' => 'product not found'], 404);
         }
 
+        if (!$productToAdd->isActive()) {
+            return $this->json(['error' => 'product is inactive'], 400);
+        }
+
         $basketItem = $basketItemRepository->createByProduct($productToAdd, $amount);
 
         // only persist if a new line was actually added. Else, quantity was just updated.
