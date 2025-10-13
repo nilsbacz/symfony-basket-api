@@ -45,19 +45,41 @@ class Basket
 
     public function addItem(BasketItem $item): BasketItem
     {
-        // If the same product already exists in this basket, increase its quantity
+        $product = $item->getProduct();
+        $qty     = $item->getQuantity();
+
+        $existing = $this->findItemByProduct($product);
+
+        // Adjust inventory once, in one place (with guard)
+        $this->decreaseStock($product, $qty);
+
+        if ($existing) {
+            $existing->setQuantity($existing->getQuantity() + $qty);
+            return $existing;
+        }
+
+        // New line item
+        $item->setBasket($this);
+        $this->items->add($item);
+        return $item;
+    }
+
+    private function findItemByProduct(Product $product): ?BasketItem
+    {
         foreach ($this->items as $existing) {
-            if ($existing->getProduct() === $item->getProduct()) {
-                $existing->setQuantity($existing->getQuantity() + $item->getQuantity());
+            if ($existing->getProduct() === $product) {
                 return $existing;
             }
         }
-
-        // Otherwise add as a new line
-        $this->items->add($item);
-        $item->setBasket($this);
-        return $item;
+        return null;
     }
+
+    private function decreaseStock(Product $product, int $by): void
+    {
+        $newQty = $product->getQuantity() - $by;
+        $product->setQuantity($newQty);
+    }
+
 
     public function removeItem(BasketItem $item): static
     {
