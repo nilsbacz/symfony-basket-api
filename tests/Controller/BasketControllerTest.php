@@ -100,6 +100,19 @@ class BasketControllerTest extends ApiTestCase
         $this->assertArrayNotHasKey('items', $json);
     }
 
+    public function testAddItemNoProductReturnsError(): void
+    {
+        $basketId = $this->createBasket();
+
+        $addRes = $this->addItemToBasket(10, 1, $basketId);
+        $this->assertResponseStatusCodeSame(404);
+        $this->assertStringContainsString('product not found', $addRes->getContent());
+
+        $json = json_decode($addRes->getContent(), true);
+        $this->assertArrayNotHasKey('id', $json);
+        $this->assertArrayNotHasKey('items', $json);
+    }
+
     protected function createBasket(): int
     {
         $res = $this->jsonRequest('POST', '/api/baskets');
