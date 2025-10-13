@@ -78,7 +78,7 @@ class Basket
     {
         $newQty = $product->getQuantity() - $by;
         if ($newQty < 0) {
-            throw new \DomainException('product out of stock. ID: '.$product->getId());
+            throw new \DomainException('product out of stock. ID: ' . $product->getId());
         }
         $product->setQuantity($newQty);
     }
