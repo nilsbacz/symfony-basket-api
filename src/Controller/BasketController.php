@@ -110,30 +110,58 @@ final class BasketController extends AbstractController
         #[MapEntity(mapping: ['itemId' => 'id'])] ?BasketItem $basketItem,
         EntityManagerInterface $entityManager
     ): Response {
+        // 404s
+        if (!$basketItem) {
+            return $this->json(['error' => 'item not found'], 404);
+        }
         if ($basketItem->getBasket()->getId() !== $id) {
             return $this->json(['error' => 'item does not belong to this basket'], 404);
         }
 
-        $requestData = $request->toArray();
-        $quantity = $requestData['quantity'] ?? null;
+        $data = $request->toArray();
+        $quantity = $data['quantity'] ?? null;
         if (!is_int($quantity)) {
             return $this->json(['error' => 'quantity is required and must be an integer'], 400);
         }
-
         if ($quantity < 0) {
             return $this->json(['error' => 'quantity must be >= 0'], 422);
         }
 
-        if ($quantity === 0) {
+        $oldQty   = $basketItem->getQuantity();
+        $newQty   = $quantity;
+        $delta    = $newQty - $oldQty; // + => add more to basket (consume stock), - => reduce basket (return stock)
+        $product  = $basketItem->getProduct();
+
+        // Delete line when setting to 0
+        if ($newQty === 0) {
+            // return stock to product
+            if ($oldQty > 0) {
+                $product->setQuantity($product->getQuantity() + $oldQty);
+            }
             $entityManager->remove($basketItem);
             $entityManager->flush();
             return new Response(null, Response::HTTP_NO_CONTENT);
         }
 
-        if ($basketItem->getQuantity() !== $quantity) {
-            $basketItem->setQuantity($quantity);
-            $entityManager->flush();
+        if ($delta === 0) {
+            // no-op
+            return new Response(null, Response::HTTP_NO_CONTENT);
         }
+
+        if ($delta > 0) {
+            // Growing the line: need to consume `delta` units from product, ensure stock
+            if ($product->getQuantity() < $delta) {
+                return $this->json(['error' => 'product out of stock'], 422);
+            }
+            $product->setQuantity($product->getQuantity() - $delta);
+        } else {
+            // Shrinking the line: return stock to product
+            $product->setQuantity($product->getQuantity() + abs($delta));
+        }
+
+        $basketItem->setQuantity($newQty);
+
+        $entityManager->flush();
 
         return new Response(null, Response::HTTP_NO_CONTENT);
     }
