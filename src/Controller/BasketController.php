@@ -69,7 +69,12 @@ final class BasketController extends AbstractController
         $basketItem = $basketItemRepository->createByProduct($productToAdd, $amount);
 
         // only persist if a new line was actually added. Else, quantity was just updated.
-        $line = $basket->addItem($basketItem);
+        try {
+            $line = $basket->addItem($basketItem);
+        } catch (\DomainException $exception) {
+            return $this->json(['error' => $exception->getMessage()], 422);
+        }
+
         if ($line->getId() === null) {
             $entityManager->persist($line);
         }

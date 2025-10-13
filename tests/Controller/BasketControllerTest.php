@@ -76,6 +76,19 @@ class BasketControllerTest extends ApiTestCase
         $this->assertSame($before - 3, $after);
     }
 
+    public function testAddItemActiveProductExceedStockReturnsError()
+    {
+        $basketId = $this->createBasket();
+
+        $addRes = $this->addItemToBasket(4, 99, $basketId);
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertStringContainsString('product out of stock', $addRes->getContent());
+
+        $this->em->clear();
+        $product = $this->em->getRepository(Product::class)->find(4);
+        $this->assertSame(15, $product->getQuantity());
+    }
+
     protected function createBasket(): int
     {
         $res = $this->jsonRequest('POST', '/api/baskets');

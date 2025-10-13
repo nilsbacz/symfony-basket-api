@@ -77,6 +77,9 @@ class Basket
     private function decreaseStock(Product $product, int $by): void
     {
         $newQty = $product->getQuantity() - $by;
+        if ($newQty < 0) {
+            throw new \DomainException('product out of stock. ID: '.$product->getId());
+        }
         $product->setQuantity($newQty);
     }
 
