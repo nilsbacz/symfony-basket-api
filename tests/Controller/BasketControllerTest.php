@@ -76,7 +76,7 @@ class BasketControllerTest extends ApiTestCase
         $this->assertSame($before - 3, $after);
     }
 
-    public function testAddItemActiveProductExceedStockReturnsError()
+    public function testAddItemActiveProductExceedStockReturnsError(): void
     {
         $basketId = $this->createBasket();
 
@@ -87,6 +87,17 @@ class BasketControllerTest extends ApiTestCase
         $this->em->clear();
         $product = $this->em->getRepository(Product::class)->find(4);
         $this->assertSame(15, $product->getQuantity());
+    }
+
+    public function testAddItemNoBasketReturnsError(): void
+    {
+        $addRes = $this->addItemToBasket(1, 1, 1);
+        $this->assertResponseStatusCodeSame(404);
+        $this->assertStringContainsString('basket not found', $addRes->getContent());
+
+        $json = json_decode($addRes->getContent(), true);
+        $this->assertArrayNotHasKey('id', $json);
+        $this->assertArrayNotHasKey('items', $json);
     }
 
     protected function createBasket(): int
