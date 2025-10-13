@@ -83,19 +83,6 @@ class Basket
         $product->setQuantity($newQty);
     }
 
-
-    public function removeItem(BasketItem $item): static
-    {
-        if ($this->items->removeElement($item)) {
-            // set the owning side to null (unless already changed)
-            if ($item->getBasket() === $this) {
-                $item->setBasket(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
