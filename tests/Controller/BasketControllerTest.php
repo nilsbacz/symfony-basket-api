@@ -290,7 +290,7 @@ class BasketControllerTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(422);
     }
 
-    public function testUpdateItem_DecreaseQuantity_RestoresStock(): void
+    public function testUpdateItemDecreaseQuantityRestoresStock(): void
     {
         // Create a basket and add 3 units of product #1
         $basketId = $this->createBasket();
