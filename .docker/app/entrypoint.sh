@@ -6,14 +6,13 @@ echo "⏳ Waiting 10 seconds for the database to be ready..."
 sleep ${WAIT_FOR_DB_SECONDS:-10}
 echo "✅ Continuing startup..."
 
-# Run migrations automatically (safe for review/demo)
-if [ "${AUTO_MIGRATE:-1}" = "1" ] && [ -f bin/console ]; then
-  if php bin/console list doctrine:migrations:migrate >/dev/null 2>&1; then
-    echo "🚀 Running migrations..."
-    php bin/console doctrine:migrations:migrate --no-interaction || true
-  else
-    echo "⚠️ Doctrine not installed yet, skipping migrations"
-  fi
+# install composer deps if missing
+if [ ! -f /var/www/html/vendor/autoload.php ]; then
+  echo "🔧 Installing Composer dependencies..."
+  composer install --no-interaction --prefer-dist --no-progress
 fi
+
+# run migrations in dev if DB is up
+php bin/console doctrine:migrations:migrate --no-interaction || true
 
 exec php-fpm

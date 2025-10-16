@@ -10,7 +10,6 @@ services:
       DATABASE_URL: "mysql://symfony:secret@db:3306/basket?serverVersion=8.0&charset=utf8mb4"
     volumes:
       - ./:/var/www/html:delegated
-      - ./vendor:/var/www/html/vendor
     depends_on:
       db:
         condition: service_healthy
